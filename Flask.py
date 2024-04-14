@@ -1,6 +1,6 @@
 from flask import Flask, request, render_template
-import numpy as np
 import tensorflow as tf
+import numpy as np
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Embedding, LSTM, Dense
 from tensorflow.keras.preprocessing.text import Tokenizer
@@ -51,4 +51,4 @@ def predict():
     return render_template('result.html', prediction=output)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0',debug=True)
