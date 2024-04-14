@@ -6,6 +6,7 @@ LABEL Maintainer="me"
 # i have chosen /usr/app/src
 WORKDIR /
 #to COPY the remote file at working directory in container
+COPY requirements.txt ./
 COPY Flask.py ./
 COPY Tokenizer2.pickle ./
 COPY templates/ ./templates
