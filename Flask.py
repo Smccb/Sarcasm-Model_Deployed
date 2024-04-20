@@ -62,8 +62,4 @@ def predict():
     return render_template('result.html', prediction=predicted_label, certainty=certainty)
 
 if __name__ == '__main__':
-<<<<<<< HEAD
     app.run(host='0.0.0.0',debug=True)
-=======
-    app.run(host='0.0.0.0', debug=True)
->>>>>>> f9ec68b (updating flask for deployment)
