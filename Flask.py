@@ -15,18 +15,29 @@ app = Flask(__name__)
 
 max_length = 140
 
-# Load the Keras model
-with open('model_cudnn_lstm_architecture2.joblib', 'rb') as f:
-    m1_loaded = model_from_json(joblib.load(f))
 
-m1_loaded.load_weights('model_cudnn_lstm_weights2.h5')
+# Load Twitter model
+with open('model_cudnn_lstm_architecture2.joblib', 'rb') as f:
+    model_twitter = model_from_json(joblib.load(f))
+
+model_twitter.load_weights('model_cudnn_lstm_weights2.h5')
 
 with open('Tokenizer2.pickle', 'rb') as handle:
-    tokenizer = pickle.load(handle)
+    tokenizer_twitter = pickle.load(handle)
 
 
+# Load Combined model
+with open('model_cudnn_lstm_architectureC.joblib', 'rb') as f:
+    model_combined = model_from_json(joblib.load(f))
 
-def predict_sarcasm(user_input, model, tokenizer, max_length, threshold=0.5):
+model_combined.load_weights('model_cudnn_lstm_weightsC.h5')
+
+with open('Tokenizer_combined.pickle', 'rb') as handle:
+    tokenizer_combined = pickle.load(handle)
+
+
+def predict_with_model(user_input, model, tokenizer, max_length, threshold=0.5):
+    
     # Tokenize and preprocess user input
     user_input_sequence = tokenizer.texts_to_sequences([user_input])
     user_input_padded = pad_sequences(user_input_sequence, maxlen=max_length)
@@ -49,17 +60,35 @@ def predict_sarcasm(user_input, model, tokenizer, max_length, threshold=0.5):
         certainty = f"{probability_not_sarcastic * 100:.2f}%"
     return predicted_label, certainty
 
+
+
 @app.route('/')
 def index():
     return render_template('index.html')
 
+@app.route('/model_input/<model_type>')
+def model_input(model_type):
+    if model_type not in ['twitter', 'combined']:
+        return "Invalid model type", 404
+    return render_template('ModelInput.html', model_type=model_type)
+
+
 @app.route('/predict', methods=['POST'])
 def predict():
+    model_type = request.form['model_type']
     user_input = request.form['user_input']
-    predicted_label, certainty = predict_sarcasm(user_input,m1_loaded,tokenizer, max_length, threshold=0.5)
     
+    if model_type == 'twitter':
+        loaded_model, tokenizer = model_twitter, tokenizer_twitter
+    elif model_type == 'combined':
+        loaded_model, tokenizer = model_combined, tokenizer_combined
+    else:
+        return "Invalid model type", 400
+    
+    predicted_label, certainty = predict_with_model(user_input, loaded_model, tokenizer, max_length)
+    return render_template('result.html', user_input=user_input, prediction=predicted_label, certainty=certainty)
 
-    return render_template('result.html', prediction=predicted_label, certainty=certainty)
+
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0',debug=True)

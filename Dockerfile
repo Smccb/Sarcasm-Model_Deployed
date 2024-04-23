@@ -16,6 +16,10 @@ COPY model_cudnn_lstm_architecture2.joblib ./
 COPY model_cudnn_lstm_weights2.h5 ./
 COPY Tokenizer2.pickle ./
 
+COPY model_cudnn_lstm_architectureC.joblib ./
+COPY model_cudnn_lstm_weightsC.h5 ./
+COPY Tokenizer_combined.pickle ./
+
 # Now the structure looks like this '/usr/app/src/test.py'
 #CMD instruction should be used to run the software
 #contained by your image, along with any arguments.
